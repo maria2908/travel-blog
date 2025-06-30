@@ -1,14 +1,16 @@
-# Use PHP with Apache
+# Use official PHP + Apache base image
 FROM php:8.2-apache
 
-# Copy your site files to the web server root
+# Install PDO MySQL extension
+RUN docker-php-ext-install pdo pdo_mysql
+
+# Copy all app files into the container
 COPY . /var/www/html/
 
-# Enable Apache rewrite module (optional, for clean URLs)
+# Enable Apache rewrite (optional)
 RUN a2enmod rewrite
 
 # Set working directory
 WORKDIR /var/www/html/
 
-# Expose port 80 for web traffic
 EXPOSE 80

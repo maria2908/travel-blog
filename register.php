@@ -62,5 +62,6 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
         <?php endif; ?>
 
         <button>Register</button>
+        <a href="login.php">Sign in</a>
     </form>
 </div>
