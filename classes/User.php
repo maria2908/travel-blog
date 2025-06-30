@@ -142,4 +142,21 @@ class User
             } 
         }
     }
+
+    public function like_post($user_id, $like)
+    {
+        if($like === 1) {
+            $query = "UPDATE user SET like_post = 1 WHERE id = :id";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':id', $user_id);
+
+            $stmt->execute();
+        } else {
+            $query = "UPDATE user SET like_post = 0 WHERE id = :id";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':id', $user_id);
+
+            $stmt->execute();
+        }
+    }
 }

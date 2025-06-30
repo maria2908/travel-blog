@@ -38,8 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['profile'])) {
     }
 }
 
-$userProfileImage = $user->getProfileImg($user_id);
-$profileImage = isset($userProfileImage['profile_image'])
+$profileImage = isset($userProfileImage['profile_image']) && $userProfileImage['profile_image'] !== ""
     ? 'uploads/user-icon/' . $userProfileImage['profile_image']
     : 'uploads/user-icon/default.jpg';
 
@@ -96,7 +95,6 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' && $active_tab == 'change_password')
             header("Location: profile_edit.php?tab=change_password");
             exit();        
         }
-        var_dump($_SESSION['message']);
 
     }
     

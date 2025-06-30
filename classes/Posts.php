@@ -13,17 +13,15 @@ class Posts
         $this->conn = $database->getConnection();
     }
 
-
     public function user_posts($user_id)
     {
-        $query = "SELECT " . " posts.id, title, text, posts.img, country, topic " . " FROM " . $this->table . " INNER JOIN country ON posts.country_id = country.id WHERE user_id=:user_id";
+        $query = "SELECT " . " posts.id, title, text, posts.img, country, topic, likes " . " FROM " . $this->table . " INNER JOIN country ON posts.country_id = country.id WHERE user_id=:user_id";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(':user_id', $user_id);
         $stmt->execute();
 
         return $stmt->fetchAll(PDO::FETCH_OBJ);
     }
-
 
     public function all_posts($country = null)
     {
@@ -53,7 +51,7 @@ class Posts
 
     public function my_posts($user_id)
     {
-        $query = "SELECT posts.id, title, text, posts.img, user_id, country, topic FROM " . $this->table . " INNER JOIN country ON posts.country_id = country.id INNER JOIN topic ON posts.topic_id = topic.id WHERE user_id=:user_id ORDER BY create_date DESC ";
+        $query = "SELECT posts.id, title, text, posts.img, user_id, country.id AS country_id, country, topic.id AS topic_id, topic FROM " . $this->table . " INNER JOIN country ON posts.country_id = country.id INNER JOIN topic ON posts.topic_id = topic.id WHERE user_id=:user_id ORDER BY create_date DESC ";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(':user_id', $user_id);
         $stmt->execute();
@@ -107,5 +105,68 @@ class Posts
         $stmt->bindParam(':create_date', $create_date);
 
         return $stmt->execute();
+    }
+
+    public function get_post_by_id($post_id)
+    {
+        $query = "SELECT posts.id, title, text, posts.img, user_id, country.id AS country_id, topic.id AS topic_id FROM " . $this->table . 
+                " INNER JOIN country ON posts.country_id = country.id INNER JOIN topic ON posts.topic_id = topic.id WHERE posts.id=:post_id ORDER BY create_date DESC ";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':post_id', $post_id);
+        $stmt->execute();
+
+        return $stmt->fetch(PDO::FETCH_OBJ);
+    }
+
+    public function delete_post_by_id($post_id) {
+        $query = "DELETE FROM posts WHERE id=:post_id";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':post_id', $post_id);
+
+        $stmt->execute();
+    }
+
+    public function update_post($post_id, $title, $text, $img, $country_id, $topic_id)
+    {
+        $query = "UPDATE posts
+                  SET title = :title, text =:text, img = :img, country_id= :country_id, topic_id = :topic_id
+                  WHERE id=:post_id";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':post_id', $post_id);
+        $stmt->bindParam(':title', $title);
+        $stmt->bindParam(':text', $text);
+        $stmt->bindParam(':img', $img);
+        $stmt->bindParam(':country_id', $country_id);
+        $stmt->bindParam(':topic_id', $topic_id);
+
+        $stmt->execute();
+
+    }
+
+    public function userLiked($user_id, $post_id) {
+        $query = "SELECT 1 FROM post_likes WHERE user_id = ? AND post_id = ?";
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute([$user_id, $post_id]);
+        return $stmt->fetchColumn() !== false;
+    }
+
+    public function likePost($user_id, $post_id) {
+        $query = "INSERT IGNORE INTO post_likes (user_id, post_id) VALUES (?, ?)";
+        $stmt = $this->conn->prepare($query);
+        return $stmt->execute([$user_id, $post_id]);
+    }
+
+    public function unlikePost($user_id, $post_id) {
+        $query = "DELETE FROM post_likes WHERE user_id = ? AND post_id = ?";
+        $stmt = $this->conn->prepare($query);
+        return $stmt->execute([$user_id, $post_id]);
+    }
+
+    public function getLikeCount($post_id) {
+        $query = "SELECT COUNT(*) FROM post_likes WHERE post_id = ?";
+        $stmt = $this->conn->prepare($query);
+
+        $stmt->execute([$post_id]);
+        return $stmt->fetchColumn();
     }
 }

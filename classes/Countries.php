@@ -15,7 +15,7 @@ class Countries
 
     public function all_countries()
     {
-        $query = "SELECT * FROM " . $this->table . " ORDER BY country.id ASC";
+        $query = "SELECT * FROM " . $this->table . " ORDER BY country.country ASC";
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
 

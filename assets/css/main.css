@@ -75,7 +75,7 @@ a {
   height: 20em;
   width: 15em;
   font-size: 1.5em;
-  color: white;
+  color: white !important;
   border-radius: 1em;
   padding: 1em;
   display: flex;
@@ -393,6 +393,7 @@ h1 {
 }
 
 .start .button__text {
+  color: white;
   position: absolute;
   inset: 0;
   animation: text-rotation 8s linear infinite;
@@ -916,6 +917,18 @@ h1 {
     font-weight: 300;
 }
 
+.edit_profile select{
+    display: block;
+    height: 50px;
+    width: 100%;
+    background-color: rgba(255,255,255,0.07);
+    border-radius: 3px;
+    padding: 0 10px;
+    margin-top: 8px;
+    font-size: 14px;
+    font-weight: 300;
+}
+
 .edit_profile input:focus {
     border: 1px solid rgb(221, 221, 221);
 }
@@ -949,4 +962,15 @@ h1 {
 .btn_group button {
   width: 15%;
   margin-left: 10px;
+}
+
+.cards-wrapper .heart {
+  display: flex;
+  width: inherit;
+  justify-content: space-between;
+  margin-top: 15px;
+}
+
+.cards-wrapper .heart svg {
+  width: 25px;
 }

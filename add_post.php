@@ -5,6 +5,7 @@ require_once('partials/header.php');
 require_once('classes/Posts.php');
 require_once('classes/Countries.php');
 require_once('classes/Topics.php');
+require_once('alert.php');
 
 
 $country_class = new Countries();
@@ -32,10 +33,18 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     if (strpos($imagePath, 'error') === false) {
 
         if ($post_class->create($title, $text, $imagePath, $user_id, $country_id, $topic_id, $create_date)) {
+            $_SESSION['message'] = "Post created successfully.";
+            $_SESSION['type_alert'] = 'success';
+
             header('Location: add_post.php');
             exit;
         } else {
-            echo "FAILED CREATING ARTICLE";
+
+            $_SESSION['message'] = "Something goes wrong";
+            $_SESSION['type_alert'] = 'error';
+            
+            header('Location: add_post.php');
+            exit;
         }
     }
 }
@@ -62,7 +71,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
                     <select name="country_id" required>
                         <option value="" disabled selected hidden>Select an Country</option>
                         <?php foreach ($all_counties as $country): ?>
-                            <option value="<?php echo $country->id ?>"><?php echo $country->label ?></option>
+                            <option value="<?php echo $country->id ?>"><?php echo $country->country ?></option>
                         <?php endforeach; ?>
                     </select>
                 </div>
@@ -72,14 +81,14 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
                     <select name="topic_id" required>
                         <option value="" disabled selected hidden>Select an Topic</option>
                         <?php foreach ($all_topics as $topic): ?>
-                            <option value="<?php echo $topic->id ?>"><?php echo $topic->label ?></option>
+                            <option value="<?php echo $topic->id ?>"><?php echo $topic->topic ?></option>
                         <?php endforeach; ?>
                     </select>
                 </div>
             </div>
 
             <label for="text">Text</label>
-            <textarea class="my-textarea" type="text" placeholder="Please enter post text" id="textarea" name="textarea" required></textarea>
+            <textarea class="my-textarea" type="text" placeholder="Please enter post text" id="textarea" name="text" required></textarea>
 
             <input name="featured_image" type="file" class="browse-button" id="featured_image">
        
