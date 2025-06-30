@@ -1,26 +1,22 @@
 <?php
-require_once('config/config.php');
+
+require_once 'config.php';
 
 class Database {
+    private $connection;
 
-    private $host = hostname;
-    private $db_name = db_name;
-    private $username = username;
-    private $password = password;
-
-    public $conn;
-
-    public function getConnection() {
-        $this->conn = null;
-
+    public function __construct() {
         try {
-            $this->conn = new PDO("mysql:host={$this->host};dbname={$this->db_name}", $this->username, $this->password);
-            $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        } catch (PDOException $exception) {
-            echo "Connection error" . $exception->getMessage();
-        }
+            $dsn = "mysql:host=" . hostname . ";dbname=" . db_name . ";charset=utf8mb4";
 
-        return $this->conn;
+            $this->connection = new PDO($dsn, username, password);
+            $this->connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        } catch (PDOException $e) {
+            die("❌ Connection error: " . $e->getMessage());
+        }
     }
 
+    public function getConnection() {
+        return $this->connection;
+    }
 }
