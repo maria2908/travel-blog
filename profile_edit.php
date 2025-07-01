@@ -30,7 +30,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['profile'])) {
 
             $user->setProfileImg($newName, $user_id);
         } else {
-            echo '❌ There was an error uploading the file.';
+            $_SESSION['message'] = '❌ There was an error uploading the file.';
+            $_SESSION['type_alert'] = 'error';
+            header("Location: profile_edit.php");
+            exit();
         }
     }
 }
