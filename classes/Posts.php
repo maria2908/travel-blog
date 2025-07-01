@@ -64,10 +64,10 @@ class Posts
         $targetDir = 'uploads/';
 
         if (!is_dir($targetDir)) {
-            mkdir($targetDir, 0755, true);
+            mkdir($targetDir, 0777, true);
         } 
 
-        chmod($targetDir, 0777);
+        // chmod($targetDir, 0777);
 
         if (isset($file) && $file['error'] === 0) {
 
