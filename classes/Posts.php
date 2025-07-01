@@ -67,7 +67,7 @@ class Posts
             mkdir($targetDir, 0755, true);
         } 
 
-        chmod($targetDir, 0755);
+        chmod($targetDir, 0777);
 
         if (isset($file) && $file['error'] === 0) {
 
