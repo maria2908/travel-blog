@@ -1,7 +1,7 @@
 <?php
 
-const hostname = "db4free.net";
-const db_name = "blog";
-const username = "root";
-const password = "";
+const hostname = "sql8.freesqldatabase.com";
+const db_name = "sql8787572";
+const username = "sql8787572";
+const password = "vV6pHjPWuX";
 
