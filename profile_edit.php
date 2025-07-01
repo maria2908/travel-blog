@@ -1,6 +1,5 @@
 <?php
 session_start();
-require_once('partials/header.php');
 require_once('classes/User.php');
 require_once('classes/Posts.php');
 require_once('helpers.php');
@@ -100,6 +99,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' && $active_tab == 'change_password')
 
 require_once ('partials/head.php');
 require_once('alert.php');
+require_once('partials/header.php');
 ?>
 
 <div class="edit_profile">

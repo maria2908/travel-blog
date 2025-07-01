@@ -1,6 +1,5 @@
 <?php
 session_start();
-require_once('partials/header.php');
 require_once('classes/Posts.php');
 
 if (!isLoggedIn()) {
@@ -26,6 +25,7 @@ if (!isLoggedIn()) {
 }
 
 require_once('partials/head.php');
+require_once('partials/header.php');
 ?>
 
 

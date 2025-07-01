@@ -1,6 +1,5 @@
 <?php
 session_start();
-require_once('partials/header.php');
 require_once('classes/Posts.php');
 require_once('classes/Countries.php');
 require_once('classes/Topics.php');
@@ -63,6 +62,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
 
 require_once ('partials/head.php');
 require_once('alert.php');
+require_once('partials/header.php');
 ?>
 <div class="edit_profile">
     <div class="control">

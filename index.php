@@ -3,7 +3,6 @@ session_start();
 require_once 'helpers.php';
 require_once 'classes/Posts.php';
 require_once 'classes/Database.php';
-require_once 'partials/header.php';
 
 if (!isLoggedIn()) {
     header("Location: login.php");
@@ -20,6 +19,7 @@ if (!isLoggedIn()) {
 }
 
 require_once 'partials/head.php';
+require_once 'partials/header.php';
 ?>
 
 <div style="margin:10px;">
