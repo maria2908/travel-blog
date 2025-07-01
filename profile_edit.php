@@ -35,14 +35,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['profile'])) {
 
             $_SESSION['message'] = 'There was an error uploading the file.';
             $_SESSION['type_alert'] = 'error';
-            
+
         }
     }
 }
 
+
+$userProfileImage = $user->getProfileImg($user_id);
+
 $profileImage = isset($userProfileImage['profile_image']) && $userProfileImage['profile_image'] !== ""
     ? 'uploads/user-icon/' . $userProfileImage['profile_image']
-    : 'uploads/user-icon/default.jpg';
+    : 'uploads/user-icon/default.png';
 
 $user_data = $user->getProfilData($user_id);
 $active_tab = $_GET['tab'] ?? 'personal_data';

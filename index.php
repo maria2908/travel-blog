@@ -23,6 +23,13 @@ require_once 'partials/header.php';
 ?>
 
 <div style="margin:10px;">
+
+<!-- index.html -->
+<form action="upload.php" method="post" enctype="multipart/form-data">
+    <input type="file" name="image" required>
+    <button type="submit">Upload to Cloudinary</button>
+</form>
+
     <div class="start">
         <h1>Share Your Journey</h1>
         <div class="subtitle">
