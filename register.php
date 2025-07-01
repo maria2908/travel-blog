@@ -1,6 +1,5 @@
 <?php
 require_once('classes/User.php');
-require_once('partials/head.php');
 require_once('helpers.php');
 
 $passwordValidation = [];
@@ -35,6 +34,8 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
         }
     }
 }
+
+require_once('partials/head.php');
 ?>
 
 <div class="sign-in-up">

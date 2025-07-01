@@ -1,12 +1,11 @@
 <?php
 session_start();
-require_once ('partials/head.php');
 require_once('partials/header.php');
 require_once('classes/Posts.php');
 require_once('classes/Countries.php');
 require_once('classes/Topics.php');
 require_once('helpers.php');
-require_once('alert.php');
+
 
 $user_id = filter_var($_SESSION['user_id'], FILTER_VALIDATE_INT);
 $posts_class = new Posts();
@@ -62,6 +61,8 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
     }
 }
 
+require_once ('partials/head.php');
+require_once('alert.php');
 ?>
 <div class="edit_profile">
     <div class="control">

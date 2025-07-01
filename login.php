@@ -1,8 +1,5 @@
 <?php
 require_once('classes/User.php');
-require_once('partials/head.php');
-require_once('alert.php');
-
 
 if ($_SERVER['REQUEST_METHOD'] == "POST") {
     $email = isset($_POST['email']) ? $_POST['email'] : '';
@@ -17,6 +14,8 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     }
 }
 
+require_once('partials/head.php');
+require_once('alert.php');
 ?>
 
 

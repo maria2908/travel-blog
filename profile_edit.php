@@ -1,11 +1,9 @@
 <?php
 session_start();
-require_once ('partials/head.php');
 require_once('partials/header.php');
 require_once('classes/User.php');
 require_once('classes/Posts.php');
 require_once('helpers.php');
-require_once('alert.php');
 
 $user = new User();
 $user_id = filter_var($_SESSION['user_id'], FILTER_VALIDATE_INT);
@@ -99,6 +97,9 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' && $active_tab == 'change_password')
     }
     
 }
+
+require_once ('partials/head.php');
+require_once('alert.php');
 ?>
 
 <div class="edit_profile">

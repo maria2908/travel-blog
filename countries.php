@@ -1,6 +1,5 @@
 <?php
 session_start();
-require_once('partials/head.php');
 require_once('partials/header.php');
 require_once('classes/Countries.php');
 
@@ -13,6 +12,8 @@ if (!isLoggedIn()) {
     $class_countries = new Countries();
     $countries = $class_countries->all_countries();
 }
+
+require_once('partials/head.php');
 ?>
 
 <div class="posts">

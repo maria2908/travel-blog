@@ -1,12 +1,9 @@
 <?php
 session_start();
-require_once('partials/head.php');
 require_once('partials/header.php');
 require_once('classes/Posts.php');
 require_once('classes/Countries.php');
 require_once('classes/Topics.php');
-require_once('alert.php');
-
 
 $country_class = new Countries();
 $all_counties = $country_class->all_countries();
@@ -48,6 +45,9 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
         }
     }
 }
+
+require_once('partials/head.php');
+require_once('alert.php');
 ?>
 
 <div class="new_post">
