@@ -42,6 +42,6 @@ require_once('alert.php');
         <input type="password" placeholder="Password" id="password" name="password" id="password">
 
         <button>Log In</button>
-        <a style="margin-top: 5px; text-decoration: underline; color:blue;" href="register.php">Sign up</a>
+        <a style="padding-top: 5px; text-decoration: underline;" href="register.php">Sign up</a>
     </form>
 </div>

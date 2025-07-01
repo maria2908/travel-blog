@@ -63,6 +63,6 @@ require_once('partials/head.php');
         <?php endif; ?>
 
         <button>Register</button>
-        <a style="margin-top: 5px; text-decoration: underline; color:blue;" href="login.php">Sign in</a>
+        <a style="padding-top: 5px; text-decoration: underline;" href="login.php">Sign in</a>
     </form>
 </div>

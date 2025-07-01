@@ -28,13 +28,14 @@ class User
 
         if ($user && $email === $user->email) {
             return "User already exists, please use another email.";
+        } else {
+            $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+            $query = "INSERT INTO " . $this->table . " (email, password) VALUES (:email, :password)";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':email', $email);
+            $stmt->bindParam(':password', $hashed_password);
         }
-        $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-        $query = "INSERT INTO " . $this->table . " (email, password) VALUES (:email, :password)";
-        $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(':email', $email);
-        $stmt->bindParam(':password', $hashed_password);
-
+        
         if ($stmt->execute()) {
             return true;
         }
