@@ -1,10 +1,7 @@
 <?php
 session_start();
 require_once('classes/Posts.php');
-
-function isLoggedIn() {
-    return isset($_SESSION['user_id']);
-}
+require_once('helpers.php');
 
 if (!isLoggedIn()) {
     header("Location: login.php");
