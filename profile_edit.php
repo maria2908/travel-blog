@@ -7,11 +7,6 @@ require_once('helpers.php');
 $user = new User();
 $user_id = filter_var($_SESSION['user_id'], FILTER_VALIDATE_INT);
 $uploadDir = 'uploads/user-icon/';
-
-if (!is_dir($uploadDir)) {
-    mkdir($uploadDir, 0777, true);
-} 
-
 $allowedTypes = ['jpg', 'jpeg', 'png', 'gif', 'avif'];
 $posts_class = new Posts();
 $user_posts = $posts_class->my_posts($user_id);
@@ -25,7 +20,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['profile'])) {
     $ext = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
 
     if (!in_array($ext, $allowedTypes)) {
-        echo '❌ Only JPG, JPEG, PNG, GIF, and AVIF files are allowed.';
+        $_SESSION['message'] = 'Only JPG, JPEG, PNG, GIF, and AVIF files are allowed.';
+        $_SESSION['type_alert'] = 'error';
     } else {
         $fileNameWithoutExt = pathinfo($fileName, PATHINFO_FILENAME);
         $newName = $fileNameWithoutExt . '_user_' . $user_id . '.' . $ext;
@@ -34,11 +30,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['profile'])) {
         if (move_uploaded_file($_FILES['profile']['tmp_name'], $targetFile)) {
 
             $user->setProfileImg($newName, $user_id);
+
         } else {
-            $_SESSION['message'] = '❌ There was an error uploading the file.';
+
+            $_SESSION['message'] = 'There was an error uploading the file.';
             $_SESSION['type_alert'] = 'error';
-            header("Location: profile_edit.php");
-            exit();
+            
         }
     }
 }

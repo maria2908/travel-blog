@@ -15,7 +15,8 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
         header("Location: index.php");
         exit(); 
     } else {
-        echo "Registration failed";
+        $_SESSION['message'] = 'Login failed';
+        $_SESSION['type_alert'] = 'error';
     }
 }
 
@@ -41,6 +42,6 @@ require_once('alert.php');
         <input type="password" placeholder="Password" id="password" name="password" id="password">
 
         <button>Log In</button>
-        <a href="register.php">Sign up</a>
+        <a style="margin-top: 5px; text-decoration: underline; color:blue;" href="register.php">Sign up</a>
     </form>
 </div>
