@@ -65,7 +65,9 @@ class Posts
 
         if (!is_dir($targetDir)) {
             mkdir($targetDir, 0755, true);
-        }
+        } 
+
+        chmod($targetDir, 0755);
 
         if (isset($file) && $file['error'] === 0) {
 
@@ -84,6 +86,7 @@ class Posts
                 }
             } else {
                 return 'Only JPG, JPEG, PNG, GIF, and WEBP files are allowed';
+
             }
         }
         return '';
