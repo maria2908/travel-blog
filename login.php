@@ -1,6 +1,10 @@
 <?php
 require_once('classes/User.php');
 
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 if ($_SERVER['REQUEST_METHOD'] == "POST") {
     $email = isset($_POST['email']) ? $_POST['email'] : '';
     $password = isset($_POST['password']) ? $_POST['password'] : '';
@@ -9,6 +13,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
     if ($user->login($email, $password)) {
         header("Location: index.php");
+        exit(); 
     } else {
         echo "Registration failed";
     }
