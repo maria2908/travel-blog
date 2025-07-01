@@ -7,6 +7,11 @@ require_once('helpers.php');
 $user = new User();
 $user_id = filter_var($_SESSION['user_id'], FILTER_VALIDATE_INT);
 $uploadDir = 'uploads/user-icon/';
+
+if (!is_dir($uploadDir)) {
+    mkdir($uploadDir, 0777, true);
+} 
+
 $allowedTypes = ['jpg', 'jpeg', 'png', 'gif', 'avif'];
 $posts_class = new Posts();
 $user_posts = $posts_class->my_posts($user_id);
