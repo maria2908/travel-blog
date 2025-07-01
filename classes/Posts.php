@@ -83,7 +83,7 @@ class Posts
                     return 'There was an error uploading the file';
                 }
             } else {
-                return 'Only JPG, JPEG, PNG, and GIF files are allowed';
+                return 'Only JPG, JPEG, PNG, GIF, and WEBP files are allowed';
             }
         }
         return '';

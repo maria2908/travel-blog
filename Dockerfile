@@ -14,3 +14,5 @@ RUN a2enmod rewrite
 WORKDIR /var/www/html/
 
 EXPOSE 80
+
+CMD ["./start.sh"]
