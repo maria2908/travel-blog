@@ -2,6 +2,10 @@
 session_start();
 require_once('classes/Posts.php');
 
+function isLoggedIn() {
+    return isset($_SESSION['user_id']);
+}
+
 if (!isLoggedIn()) {
     header("Location: login.php");
     $_SESSION['message'] = 'You are not authorized. Please log in first to continue.';

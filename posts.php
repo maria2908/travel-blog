@@ -2,26 +2,19 @@
 session_start();
 require_once('classes/Posts.php');
 
-if (!isLoggedIn()) {
-    header("Location: login.php");
-    $_SESSION['message'] = 'You are not authorized. Please log in first to continue.';
-    $_SESSION['type_alert'] = 'error';
-    exit;
+$class_posts = new Posts();
+
+$country = "";
+if ($_SERVER["REQUEST_METHOD"] == "POST" && !empty($_POST['country'])) {
+    $country = htmlspecialchars($_POST['country']);
+} elseif (!empty($_GET['country'])) {
+    $country = htmlspecialchars($_GET['country']);
+}
+
+if (!empty($country)) {
+    $posts = $class_posts->all_posts($country);
 } else {
-    $class_posts = new Posts();
-
-    $country = "";
-    if ($_SERVER["REQUEST_METHOD"] == "POST" && !empty($_POST['country'])) {
-        $country = htmlspecialchars($_POST['country']);
-    } elseif (!empty($_GET['country'])) {
-        $country = htmlspecialchars($_GET['country']);
-    }
-
-    if (!empty($country)) {
-        $posts = $class_posts->all_posts($country);
-    } else {
-        $posts = $class_posts->all_posts();
-    }
+    $posts = $class_posts->all_posts();
 }
 
 require_once('partials/head.php');
