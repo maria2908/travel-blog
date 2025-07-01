@@ -71,11 +71,11 @@ class Posts
 
             $targetFile = $targetDir . basename($file['name']);
             $imageFileType = strtolower(pathinfo($targetFile, PATHINFO_EXTENSION));
-            $allowedTypes = ['jpg', 'jpeg', 'png', 'gif'];
+            $allowedTypes = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
 
             if (in_array($imageFileType, $allowedTypes)) {
-                $uniqueFileName = uniqid() . '_' . time() . '.' . $imageFileType;
-                $targetFile = $targetFile . "_" . $uniqueFileName;
+                $uniqueFileName = pathinfo($file['name'], PATHINFO_FILENAME) . '_' . uniqid() . '_' . time() . '.' . $imageFileType;
+                $targetFile = $targetDir . $uniqueFileName;
 
                 if (move_uploaded_file($file['tmp_name'], $targetFile)) {
                     return $targetFile;
