@@ -217,7 +217,7 @@ require_once('partials/header.php');
                     </div>
                     <div>
                         <label for="confirm_password">Confirm Password</label>
-                        <input type="password" value="" placeholder="Please enter old password" id="confirm_password" name="confirm_password" required>
+                        <input type="password" value="" placeholder="Please enter new password to confirm it" id="confirm_password" name="confirm_password" required>
                         <?php if (!empty($confirm_passwordValidationError) && is_array($confirm_passwordValidationError)): ?>
                             <div style="color: red; font-size: 10px; margin-top: 5px;">
                                 <?php foreach ($confirm_passwordValidationError as $error): ?>
