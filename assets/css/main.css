@@ -967,7 +967,7 @@ h1 {
 .cards-wrapper .heart {
   display: flex;
   width: inherit;
-  justify-content: space-between;
+  justify-content: end;
   margin-top: 15px;
 }
 

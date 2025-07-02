@@ -37,6 +37,14 @@ class User
         }
         
         if ($stmt->execute()) {
+            $query = "SELECT * FROM " . $this->table . " WHERE email=:email ";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':email', $email);
+            $stmt->execute();
+            $user = $stmt->fetch(PDO::FETCH_OBJ);
+            $_SESSION['email'] = $user->email;
+            $_SESSION['user_id'] = $user->id;
+
             return true;
         }
 

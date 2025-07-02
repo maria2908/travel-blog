@@ -158,6 +158,7 @@ class Posts
         $query = "INSERT IGNORE INTO post_likes (user_id, post_id) VALUES (?, ?)";
         $stmt = $this->conn->prepare($query);
         return $stmt->execute([$user_id, $post_id]);
+
     }
 
     public function unlikePost($user_id, $post_id) {

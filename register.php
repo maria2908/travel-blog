@@ -25,7 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
             $registerResult = $user->register($email, $password);
 
             if($registerResult === true) {
-                header("Location: login.php");
+                header("Location: index.php");
                 exit();
             } else {
                 $emailError = $registerResult;
@@ -33,32 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
         }
     }
 }
-// if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
-//     $email = isset($_POST['email']) ? $_POST['email'] : '';
-//     $password = isset($_POST['password']) ? $_POST['password'] : '';
-
-//     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-//         $_SESSION['message'] = "Invalid email format";
-//         $_SESSION['type_alert'] = 'error';
-//     } else {
-//         $passwordValidation = validatePassword($password);
-
-//         if ($passwordValidation === true) {
-
-//             $registerResult = $user->register($email, $password);
-
-//             if ($registerResult === true) {
-
-//                 header("Location: login.php");
-//                 exit();
-//             } else {
-//                 $_SESSION['message'] = $registerResult;
-//                 $_SESSION['type_alert'] = 'error';
-//             }
-//         }
-//     }
-// }
 require_once('partials/head.php');
 
 ?>
@@ -88,6 +63,6 @@ require_once('partials/head.php');
         <?php endif; ?>
 
         <button>Register</button>
-        <a style="padding-top: 5px; text-decoration: underline;" href="register.php">Sign in</a>
+        <a style="padding-top: 5px; text-decoration: underline;" href="login.php">Sign in</a>
     </form>
 </div>

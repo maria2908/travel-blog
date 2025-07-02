@@ -3,107 +3,126 @@ session_start();
 require_once('classes/User.php');
 require_once('classes/Posts.php');
 require_once('helpers.php');
+require __DIR__ . '/vendor/autoload.php';
+
+use Cloudinary\Configuration\Configuration;
+use Cloudinary\Api\Upload\UploadApi;
+
+Configuration::instance('cloudinary://233295889131347:c4EhYIk_BO1v1Lc7d1WSHZBZ--U@ducl1lqi0?secure=true');
 
 $user = new User();
 $user_id = filter_var($_SESSION['user_id'], FILTER_VALIDATE_INT);
-$uploadDir = 'uploads/user-icon/';
-$allowedTypes = ['jpg', 'jpeg', 'png', 'gif', 'avif'];
 $posts_class = new Posts();
 $user_posts = $posts_class->my_posts($user_id);
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['profile'])) {
-    if (!file_exists($uploadDir)) {
-        mkdir($uploadDir, 0777, true);
-    }
-
-    $fileName = basename($_FILES['profile']['name']);
-    $ext = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
-
-    if (!in_array($ext, $allowedTypes)) {
-        $_SESSION['message'] = 'Only JPG, JPEG, PNG, GIF, and AVIF files are allowed.';
-        $_SESSION['type_alert'] = 'error';
-    } else {
-        $fileNameWithoutExt = pathinfo($fileName, PATHINFO_FILENAME);
-        $newName = $fileNameWithoutExt . '_user_' . $user_id . '.' . $ext;
-        $targetFile = $uploadDir . $newName;
-
-        if (move_uploaded_file($_FILES['profile']['tmp_name'], $targetFile)) {
-
-            $user->setProfileImg($newName, $user_id);
-
-        } else {
-
-            $_SESSION['message'] = 'There was an error uploading the file.';
-            $_SESSION['type_alert'] = 'error';
-
-        }
-    }
-}
-
-
-$userProfileImage = $user->getProfileImg($user_id);
-
-$profileImage = isset($userProfileImage['profile_image']) && $userProfileImage['profile_image'] !== ""
-    ? 'uploads/user-icon/' . $userProfileImage['profile_image']
-    : 'uploads/user-icon/default.png';
-
-$user_data = $user->getProfilData($user_id);
+$action = $_POST['action'] ?? null;
 $active_tab = $_GET['tab'] ?? 'personal_data';
+$user_data = $user->getProfilData($user_id);
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && $active_tab == 'personal_data') 
-{
-    $fields = ['firstname', 'lastname', 'email', 'phone', 'country', 'city', 'instagram'];
+$allowedTypes = ['jpg', 'jpeg', 'png', 'gif', 'avif', 'webp'];
+$img = '';
 
-    foreach ($fields as $field) {
-        $new_value = htmlspecialchars(trim($_POST[$field] ?? ''));
-        if ($new_value !== $user_data[$field]) {
-            $user->setProfilData($field, $new_value, $user_id);
-        }
-    }
-    header("Location: " . $_SERVER['REQUEST_URI']);
-    exit;
-}
+if ($_SERVER['REQUEST_METHOD'] === 'POST' ) {
+    
+    if ($action === 'upload_image' && isset($_FILES['profile_img'])) {
+        $filename = $_FILES['profile_img']['name'];
+        $tmp_path = $_FILES['profile_img']['tmp_name'];
+        $ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
 
-if($_SERVER['REQUEST_METHOD'] === 'POST' && $active_tab == 'change_password')
-{
-    $current_password = isset($_POST['current_password']) ? $_POST['current_password'] : '';
-    $new_password = isset($_POST['new_password']) ? $_POST['new_password'] : '';
-    $confirm_password = isset($_POST['confirm_password']) ? $_POST['confirm_password'] : '';
+        if (!in_array($ext, $allowedTypes)) {
 
-    $current_passwordValidationError = validatePassword($current_password);
-    $new_passwordValidationError = validatePassword($new_password);
-    $confirm_passwordValidationError = validatePassword($confirm_password);
-
-    if ($current_passwordValidationError !== true) {
-        $current_passwordValidation = $current_passwordValidationError;
-
-    } elseif ($new_passwordValidationError !== true) {
-        $new_passwordValidation = $new_passwordValidationError;
-
-    } elseif ($confirm_passwordValidationError !== true) {
-        $confirm_passwordValidation = $confirm_passwordValidationError;
-
-    } else {
-        $password_change_result = $user->change_password($user_id, $current_password, $new_password, $confirm_password);
-
-        if ($password_change_result === true) {
-
-            $_SESSION['message'] = "Password changed successfully.";
-            $_SESSION['type_alert'] = 'success';
-
-            header("Location: profile_edit.php?tab=change_password");
-            exit();
-        } else {
-            $_SESSION['message'] = $password_change_result;
+            $_SESSION['message'] = 'Only JPG, JPEG, PNG, GIF, AVIF and WEBP files are allowed.';
             $_SESSION['type_alert'] = 'error';
+        } else {
 
-            header("Location: profile_edit.php?tab=change_password");
-            exit();        
+            $original_name = pathinfo($filename, PATHINFO_FILENAME);
+
+            try {
+                $upload = new UploadApi();
+                $result = $upload->upload($tmp_path, [
+                    'public_id' => $original_name,
+                    'use_filename' => true,
+                    'overwrite' => true
+                ]);
+
+                $img = $result['secure_url']; 
+            } catch (Exception $e) {
+                $_SESSION['message'] = "Image upload failed: " . $e->getMessage();
+                $_SESSION['type_alert'] = 'error';
+                header('Location: profile_edit.php');
+                exit;
+            }
+            
+            try {
+                $user->setProfileImg($img, $user_id);
+            
+                
+                $_SESSION['message'] = "Profile image was changed successfully";
+                $_SESSION['type_alert'] = 'success';
+            }catch (Exception $e) {
+                $_SESSION['message'] = "Image upload failed: " . $e->getMessage();
+                $_SESSION['type_alert'] = 'error';
+            }
+
         }
 
+    }
+
+    if ($action === 'update_personal_data') {
+        $fields = ['firstname', 'lastname', 'email', 'phone', 'country', 'city', 'instagram'];
+
+        foreach ($fields as $field) {
+            $new_value = htmlspecialchars(trim($_POST[$field] ?? ''));
+            if ($new_value !== $user_data[$field]) {
+                $user->setProfilData($field, $new_value, $user_id);
+            }
+        }
+        header("Location: " . $_SERVER['REQUEST_URI']);
+        exit;
     }
     
+    if ($action === 'change_password') {
+        $current_password = isset($_POST['current_password']) ? $_POST['current_password'] : '';
+        $new_password = isset($_POST['new_password']) ? $_POST['new_password'] : '';
+        $confirm_password = isset($_POST['confirm_password']) ? $_POST['confirm_password'] : '';
+
+        $current_passwordValidationError = validatePassword($current_password);
+        $new_passwordValidationError = validatePassword($new_password);
+        $confirm_passwordValidationError = validatePassword($confirm_password);
+
+        if ($current_passwordValidationError !== true) {
+            $current_passwordValidation = $current_passwordValidationError;
+
+        } elseif ($new_passwordValidationError !== true) {
+            $new_passwordValidation = $new_passwordValidationError;
+
+        } elseif ($confirm_passwordValidationError !== true) {
+            $confirm_passwordValidation = $confirm_passwordValidationError;
+
+        } else {
+            $password_change_result = $user->change_password($user_id, $current_password, $new_password, $confirm_password);
+
+            if ($password_change_result === true) {
+
+                $_SESSION['message'] = "Password changed successfully.";
+                $_SESSION['type_alert'] = 'success';
+
+                header("Location: profile_edit.php?tab=change_password");
+                exit();
+            } else {
+                $_SESSION['message'] = $password_change_result;
+                $_SESSION['type_alert'] = 'error';
+
+                header("Location: profile_edit.php?tab=change_password");
+                exit();        
+            }
+
+        }
+    }
 }
+
+$userProfileImage = $user->getProfileImg($user_id);
+$profileImage = isset($userProfileImage) ? $userProfileImage['profile_image'] : 'uploads/user-icon/default.jpg';
+
 
 require_once ('partials/head.php');
 require_once('alert.php');
@@ -119,13 +138,14 @@ require_once('partials/header.php');
         <div class="navigation">
             <div class="profile-container">
                 <form method="POST" enctype="multipart/form-data" id="uploadForm">
+                    <input type="hidden" name="action" value="upload_image">
                     <img src="<?php echo $profileImage; ?>" class="profile-pic" id="profileImage">
                     <label for="fileInput" class="upload-icon">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
                             <path fill="#ffffff" d="M149.1 64.8L138.7 96 64 96C28.7 96 0 124.7 0 160L0 416c0 35.3 28.7 64 64 64l384 0c35.3 0 64-28.7 64-64l0-256c0-35.3-28.7-64-64-64l-74.7 0L362.9 64.8C356.4 45.2 338.1 32 317.4 32L194.6 32c-20.7 0-39 13.2-45.5 32.8zM256 192a96 96 0 1 1 0 192 96 96 0 1 1 0-192z" />
                         </svg>
                     </label>
-                    <input type="file" name="profile" id="fileInput" accept="image/*">
+                    <input type="file" name="profile_img" id="fileInput" accept="image/*">
                 </form>
             </div>
             <a class="<?= $active_tab === 'personal_data' ? 'active' : '' ?>" href="?tab=personal_data">Personal Data</a>
@@ -136,6 +156,7 @@ require_once('partials/header.php');
         <div class="edit">
             <?php if ($active_tab === 'personal_data'): ?>
                 <form id="personal_data" method="POST">
+                    <input type="hidden" name="action" value="update_personal_data">
                     <h3>Personal Data</h3>
 
                     <div class="user_data">
@@ -178,6 +199,7 @@ require_once('partials/header.php');
                 </form>
             <?php elseif ($active_tab === 'change_password'): ?>
                 <form id="change_password" method="POST">
+                    <input type="hidden" name="action" value="change_password">
                     <h3>Change Password</h3>
                     <div>
                         <label for="current_password">Current Password</label>
