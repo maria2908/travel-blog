@@ -3,6 +3,12 @@ session_start();
 require_once('classes/Posts.php');
 require_once('classes/Countries.php');
 require_once('classes/Topics.php');
+require __DIR__ . '/vendor/autoload.php';
+
+use Cloudinary\Configuration\Configuration;
+use Cloudinary\Api\Upload\UploadApi;
+
+Configuration::instance('cloudinary://233295889131347:c4EhYIk_BO1v1Lc7d1WSHZBZ--U@ducl1lqi0?secure=true');
 
 $country_class = new Countries();
 $all_counties = $country_class->all_countries();
@@ -26,8 +32,14 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
         $original_name = pathinfo($_FILES['featured_image']['name'], PATHINFO_FILENAME);
 
         try {
-            require 'php_quickstart.php';
-            echo $img;
+            $upload = new UploadApi();
+            $result = $upload->upload($tmp_path, [
+                'public_id' => $original_name,
+                'use_filename' => true,
+                'overwrite' => true
+            ]);
+
+            $img = $result['secure_url']; 
         } catch (Exception $e) {
             $_SESSION['message'] = "Image upload failed: " . $e->getMessage();
             $_SESSION['type_alert'] = 'error';
