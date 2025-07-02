@@ -3,7 +3,6 @@ session_start();
 require_once 'helpers.php';
 require_once 'classes/Posts.php';
 require_once 'classes/Database.php';
-require 'php_quickstart.php';
 
 
 if (!isLoggedIn()) {
