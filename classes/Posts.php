@@ -59,38 +59,39 @@ class Posts
         return $stmt->fetchAll(PDO::FETCH_OBJ);
     }
 
-    public function uploadImage($file)
-    {
-        $targetDir = 'uploads/';
+    // public function uploadImage($file)
+    // {
+    //     // $targetDir = 'uploads/';
 
-        if (!is_dir($targetDir)) {
-            mkdir($targetDir, 0777, true);
-        } 
 
-        // chmod($targetDir, 0777);
+    //     // if (!is_dir($targetDir)) {
+    //     //     mkdir($targetDir, 0777, true);
+    //     // } 
 
-        if (isset($file) && $file['error'] === 0) {
+    //     // chmod($targetDir, 0777);
 
-            $targetFile = $targetDir . basename($file['name']);
-            $imageFileType = strtolower(pathinfo($targetFile, PATHINFO_EXTENSION));
-            $allowedTypes = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+    //     if (isset($file) && $file['error'] === 0) {
 
-            if (in_array($imageFileType, $allowedTypes)) {
-                $uniqueFileName = pathinfo($file['name'], PATHINFO_FILENAME) . '_' . uniqid() . '_' . time() . '.' . $imageFileType;
-                $targetFile = $targetDir . $uniqueFileName;
+    //         $targetFile = basename($file['name']);
+    //         $imageFileType = strtolower(pathinfo($targetFile, PATHINFO_EXTENSION));
+    //         $allowedTypes = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
 
-                if (move_uploaded_file($file['tmp_name'], $targetFile)) {
-                    return $targetFile;
-                } else {
-                    return 'There was an error uploading the file';
-                }
-            } else {
-                return 'Only JPG, JPEG, PNG, GIF, and WEBP files are allowed';
+    //         if (in_array($imageFileType, $allowedTypes)) {
+    //             $uniqueFileName = pathinfo($file['name'], PATHINFO_FILENAME) . '_' . uniqid() . '_' . time() . '.' . $imageFileType;
+    //             $targetFile = $uniqueFileName;
 
-            }
-        }
-        return '';
-    }
+    //             if (move_uploaded_file($file['tmp_name'], $targetFile)) {
+    //                 return $targetFile;
+    //             } else {
+    //                 return 'There was an error uploading the file';
+    //             }
+    //         } else {
+    //             return 'Only JPG, JPEG, PNG, GIF, and WEBP files are allowed';
+
+    //         }
+    //     }
+    //     return '';
+    // }
 
     public function create($title, $text, $img, $user_id, $country_id, $topic_id, $create_date)
     {

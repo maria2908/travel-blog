@@ -31,7 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['like'], $_POST['post_
                 <input type="hidden" name="img" value="<?php echo htmlspecialchars($post->img) ?>">
                 <input type="hidden" name="country" value="<?php echo htmlspecialchars($post->country) ?>">
 
-                <button type="submit" class="card" style="background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('./<?php echo $post->img ?>')">
+                <button type="submit" class="card" style="background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('<?php echo $post->img ?>')">
                     <div>
                         <h1><?php echo $post->title ?></h1>
                         <p><?php if (strlen($post->text) > 70): ?>

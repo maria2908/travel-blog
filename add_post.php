@@ -11,7 +11,6 @@ $topic_class = new Topics();
 $all_topics = $topic_class->all_topics();
 
 if ($_SERVER['REQUEST_METHOD'] == "POST") {
-
     $title = $_POST['title'];
     $text = $_POST['text'];
     $user_id = $_SESSION['user_id'];
@@ -19,30 +18,36 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     $topic_id = $_POST['topic_id'];
     $create_date = date('Y-m-d H:i:s');
 
+    $img = null;
 
-    //UPLOADING IMAGE
+    if (isset($_FILES['featured_image']) && $_FILES['featured_image']['error'] === 0) {
 
-    $post_class = new Posts();
+        $tmp_path = $_FILES['featured_image']['tmp_name'];
+        $original_name = pathinfo($_FILES['featured_image']['name'], PATHINFO_FILENAME);
 
-    $imagePath = $post_class->uploadImage($_FILES['featured_image']);
-
-    if (strpos($imagePath, 'error') === false) {
-
-        if ($post_class->create($title, $text, $imagePath, $user_id, $country_id, $topic_id, $create_date)) {
-            $_SESSION['message'] = "Post created successfully.";
-            $_SESSION['type_alert'] = 'success';
-
-            header('Location: add_post.php');
-            exit;
-        } else {
-
-            $_SESSION['message'] = "Something goes wrong";
+        try {
+            require 'php_quickstart.php';
+            echo $img;
+        } catch (Exception $e) {
+            $_SESSION['message'] = "Image upload failed: " . $e->getMessage();
             $_SESSION['type_alert'] = 'error';
-            
             header('Location: add_post.php');
             exit;
         }
     }
+
+    $post_class = new Posts();
+
+    if ($post_class->create($title, $text, $img, $user_id, $country_id, $topic_id, $create_date)) {
+        $_SESSION['message'] = "Post created successfully.";
+        $_SESSION['type_alert'] = 'success';
+    } else {
+        $_SESSION['message'] = "Something went wrong.";
+        $_SESSION['type_alert'] = 'error';
+    }
+
+    header('Location: add_post.php');
+    exit;
 }
 
 require_once('partials/head.php');
