@@ -16,8 +16,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['like'], $_POST['post_
         $posts_class->unlikePost($user_id, $post_id);
     }
 
-    header("Location: " . $_SERVER['PHP_SELF']);
-    exit;
 }
 ?>
 

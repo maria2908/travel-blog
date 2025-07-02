@@ -37,6 +37,7 @@ class User
         }
         
         if ($stmt->execute()) {
+            session_start();
             $query = "SELECT * FROM " . $this->table . " WHERE email=:email ";
             $stmt = $this->conn->prepare($query);
             $stmt->bindParam(':email', $email);

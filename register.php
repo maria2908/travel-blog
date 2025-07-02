@@ -25,6 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
             $registerResult = $user->register($email, $password);
 
             if($registerResult === true) {
+        
                 header("Location: index.php");
                 exit();
             } else {

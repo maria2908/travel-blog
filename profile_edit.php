@@ -121,8 +121,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' ) {
 }
 
 $userProfileImage = $user->getProfileImg($user_id);
-$profileImage = isset($userProfileImage) ? $userProfileImage['profile_image'] : 'uploads/user-icon/default.jpg';
-
+$profileImage = isset($userProfileImage) && $userProfileImage !='' ? $userProfileImage['profile_image'] : 'uploads/user-icon/default.jpg';
 
 require_once ('partials/head.php');
 require_once('alert.php');
