@@ -22,7 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['like'], $_POST['post_
 <section class="cards-wrapper">
     <?php foreach ($posts as $post): ?>
         <div>
-            <form method="post" action="post.php" class="card-grid-space" style="all: unset;">
+            <form method="post" action="post.php?id=<?= $post->id ?>" class="card-grid-space" style="all: unset;">
                 <input type="hidden" name="id" value="<?php echo htmlspecialchars($post->id) ?>">
                 <input type="hidden" name="title" value="<?php echo htmlspecialchars($post->title) ?>">
                 <input type="hidden" name="text" value="<?php echo htmlspecialchars($post->text) ?>">

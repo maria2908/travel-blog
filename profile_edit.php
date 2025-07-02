@@ -48,8 +48,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' ) {
             } catch (Exception $e) {
                 $_SESSION['message'] = "Image upload failed: " . $e->getMessage();
                 $_SESSION['type_alert'] = 'error';
-                header('Location: profile_edit.php');
-                exit;
             }
             
             try {
@@ -75,9 +73,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' ) {
             if ($new_value !== $user_data[$field]) {
                 $user->setProfilData($field, $new_value, $user_id);
             }
-        }
-        header("Location: " . $_SERVER['REQUEST_URI']);
-        exit;
+        }        
+    
     }
     
     if ($action === 'change_password') {
@@ -105,15 +102,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' ) {
 
                 $_SESSION['message'] = "Password changed successfully.";
                 $_SESSION['type_alert'] = 'success';
-
-                header("Location: profile_edit.php?tab=change_password");
-                exit();
+                
             } else {
                 $_SESSION['message'] = $password_change_result;
                 $_SESSION['type_alert'] = 'error';
-
-                header("Location: profile_edit.php?tab=change_password");
-                exit();        
+   
             }
 
         }
@@ -121,7 +114,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' ) {
 }
 
 $userProfileImage = $user->getProfileImg($user_id);
-$profileImage = isset($userProfileImage) && $userProfileImage !='' ? $userProfileImage['profile_image'] : 'uploads/user-icon/default.jpg';
+$profileImage = (!empty($userProfileImage['profile_image']))  ? $userProfileImage['profile_image'] : 'uploads/user-icon/default.jpg';
 
 require_once ('partials/head.php');
 require_once('alert.php');

@@ -974,3 +974,9 @@ h1 {
 .cards-wrapper .heart svg {
   width: 25px;
 }
+
+
+.back svg {
+  width: 25px;
+  padding: 10px 0;
+}

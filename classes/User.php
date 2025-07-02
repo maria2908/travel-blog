@@ -128,7 +128,7 @@ class User
         $stored_hashed_password = $result->password;
         $hashed_new_password = password_hash($new_password, PASSWORD_DEFAULT);
 
-        var_dump(password_verify($current_password, $stored_hashed_password));
+        // var_dump(password_verify($current_password, $stored_hashed_password));s
         
         if (!password_verify($current_password, $stored_hashed_password)) {
             return "The current password is incorrect.";

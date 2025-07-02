@@ -53,6 +53,9 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     if ($post_class->create($title, $text, $img, $user_id, $country_id, $topic_id, $create_date)) {
         $_SESSION['message'] = "Post created successfully.";
         $_SESSION['type_alert'] = 'success';
+
+        header('Location: my_posts.php');
+        exit;
     } else {
         $_SESSION['message'] = "Something went wrong.";
         $_SESSION['type_alert'] = 'error';
