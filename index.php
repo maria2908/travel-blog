@@ -5,12 +5,15 @@ require_once 'classes/Posts.php';
 require_once 'classes/Database.php';
 
 
-$db = new Database();
-$conn = $db->getConnection();
+$conn = (new Database())->getConnection();
 
-$stmt = $conn->prepare("SELECT posts.id, title, text, posts.img, country, topic FROM posts INNER JOIN country ON posts.country_id = country.id INNER JOIN topic ON posts.topic_id = topic.id  ORDER BY create_date DESC LIMIT 6");
-$stmt->execute();
-$posts = $stmt->fetchAll(PDO::FETCH_OBJ);
+$filters = [
+    'order' => 'create_date.desc',
+    'limit' => 4
+];
+
+$posts = array_map(fn($p) => (object) $p, $conn->select('posts_view', $filters));
+
 
 
 require_once 'partials/head.php';
@@ -95,7 +98,7 @@ require_once 'partials/header.php';
         </div>
         <div>
             <h1>Posts</h1>
-            <div class="cards-wrapper">
+            <div class="cards-wrapper-main">
                 <?php foreach ($posts as $post): ?>
                     <?php include 'components/card.php'; ?>
                 <?php endforeach; ?>

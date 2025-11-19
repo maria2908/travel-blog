@@ -17,7 +17,6 @@ $user_posts = $posts_class->my_posts($user_id);
 $action = $_POST['action'] ?? null;
 $active_tab = $_GET['tab'] ?? 'personal_data';
 $user_data = $user->getProfilData($user_id);
-
 $allowedTypes = ['jpg', 'jpeg', 'png', 'gif', 'avif', 'webp'];
 $img = '';
 
@@ -114,7 +113,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' ) {
 }
 
 $userProfileImage = $user->getProfileImg($user_id);
-$profileImage = (!empty($userProfileImage['profile_image']))  ? $userProfileImage['profile_image'] : 'uploads/user-icon/default.jpg';
+$profileImage = !empty($userProfileImage) ? $userProfileImage : 'uploads/user-icon/default.jpg';
 
 require_once ('partials/head.php');
 require_once('alert.php');

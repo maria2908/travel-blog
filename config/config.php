@@ -1,7 +1,4 @@
 <?php
 
-const hostname = "sql8.freesqldatabase.com";
-const db_name = "sql8787572";
-const username = "sql8787572";
-const password = "vV6pHjPWuX";
-
+const SUPABASE_URL = 'https://kjxvqeijhiappqvtolcq.supabase.co';
+const SUPABASE_API_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtqeHZxZWlqaGlhcHBxdnRvbGNxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM0NjQ3NjksImV4cCI6MjA3OTA0MDc2OX0.8BfYL8FAbfndx221_FU75bqfNLIVt007hrs84sPOv10';

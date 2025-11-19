@@ -6,9 +6,9 @@ $class_posts = new Posts();
 
 $country = "";
 if ($_SERVER["REQUEST_METHOD"] == "POST" && !empty($_POST['country'])) {
-    $country = htmlspecialchars($_POST['country']);
+    $country = strtolower(htmlspecialchars($_POST['country']));
 } elseif (!empty($_GET['country'])) {
-    $country = htmlspecialchars($_GET['country']);
+    $country = strtolower(htmlspecialchars($_GET['country']));
 }
 
 if (!empty($country)) {

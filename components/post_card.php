@@ -5,7 +5,6 @@ require_once('classes/User.php');
 $user_id = $_SESSION['user_id'] ?? null;
 $posts_class = new Posts();
 
-
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['like'], $_POST['post_id']))
 {
     $post_id = (int) $_POST['post_id'];
@@ -17,6 +16,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['like'], $_POST['post_
     }
 
 }
+$posts = array_map(function($item) {
+    return (object) $item;
+}, $posts);
+
 ?>
 
 <section class="cards-wrapper">

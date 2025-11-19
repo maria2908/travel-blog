@@ -1,24 +1,18 @@
 <?php
+require_once('classes/Database.php');
 
 class Countries
 {
     private $conn;
-    private $table = 'country';
 
     public function __construct()
     {
-        require_once('classes/Database.php');
-        $database = new Database();
-        $this->conn = $database->getConnection();
+        $this->conn = (new Database())->getConnection();
     }
 
 
     public function all_countries()
     {
-        $query = "SELECT * FROM " . $this->table . " ORDER BY country.country ASC";
-        $stmt = $this->conn->prepare($query);
-        $stmt->execute();
-
-        return $stmt->fetchAll(PDO::FETCH_OBJ);
+        return array_map(fn($c) => (object) $c, $this->conn->select('country', ['order' => 'country.asc']));
     }
 }

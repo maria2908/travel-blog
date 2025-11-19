@@ -1,4 +1,5 @@
 <?php
+require_once('classes/Database.php');
 
 class User
 {
@@ -8,9 +9,7 @@ class User
 
     public function __construct()
     {
-        require_once('classes/Database.php');
-        $database = new Database();
-        $this->conn = $database->getConnection();
+        $this->conn = (new Database())->getConnection();
     }
 
     public function register($email, $password)
@@ -19,33 +18,22 @@ class User
             return "Email and password cannot be empty.";
         }
 
-        $query_compare = "SELECT * FROM " . $this->table . " WHERE email=:email";
-        $stmt = $this->conn->prepare($query_compare);
-        $stmt->bindParam(':email', $email);
-        $stmt->execute();
+        $existing = $this->conn->select('user', ['email' => 'eq.' . $email]);
 
-        $user = $stmt->fetch(PDO::FETCH_OBJ);
-
-        if ($user && $email === $user->email) {
+        if (!empty($existing)) {
             return "User already exists, please use another email.";
-        } else {
-            $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-            $query = "INSERT INTO " . $this->table . " (email, password) VALUES (:email, :password)";
-            $stmt = $this->conn->prepare($query);
-            $stmt->bindParam(':email', $email);
-            $stmt->bindParam(':password', $hashed_password);
         }
-        
-        if ($stmt->execute()) {
-            session_start();
-            $query = "SELECT * FROM " . $this->table . " WHERE email=:email ";
-            $stmt = $this->conn->prepare($query);
-            $stmt->bindParam(':email', $email);
-            $stmt->execute();
-            $user = $stmt->fetch(PDO::FETCH_OBJ);
-            $_SESSION['email'] = $user->email;
-            $_SESSION['user_id'] = $user->id;
 
+ 
+        $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+        $data = ['email' => $email, 'password' => $hashed_password];
+        $result = $this->conn->insert($this->table, [$data]);
+    
+    
+        if (!empty($result)) {
+            session_start();
+            $_SESSION['email'] = $result[0]['email'];
+            $_SESSION['user_id'] = $result[0]['id'];
             return true;
         }
 
@@ -54,119 +42,64 @@ class User
 
     public function login($email, $password)
     {
-        $query = "SELECT * FROM " . $this->table . " WHERE email=:email ";
-        $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(':email', $email);
-        $stmt->execute();
+        $user = $this->conn->select($this->table, ['email' => 'eq.' . $email]);
 
-        $user = $stmt->fetch(PDO::FETCH_OBJ);
-
-        if ($user && password_verify($password, $user->password)) {
-            $_SESSION['email'] = $user->email;
-            $_SESSION['user_id'] = $user->id;
-
+        if (!empty($user) && password_verify($password, $user[0]['password'])) {
+            $_SESSION['email'] = $user[0]['email'];
+            $_SESSION['user_id'] = $user[0]['id'];
             return true;
         }
+        return false;
     }
 
     public function setProfileImg($profile_image, $id)
     {
-        $query = "UPDATE user SET profile_image = :profile_image WHERE id = :id";
-        $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(':id', $id);
-        $stmt->bindParam(':profile_image', $profile_image);
-
-        $stmt->execute();
+        return $this->conn->update($this->table, ['id' => 'eq.' . $id], ['profile_image' => $profile_image]);
     }
 
     public function getProfileImg($id)
     {
-        $query = "SELECT profile_image FROM user WHERE id = :id";
-        $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(':id', $id);
-        $stmt->execute();
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+        $result = $this->conn->select($this->table, ['id' => 'eq.' . $id]);
+        return $result[0]['profile_image'] ?? null;
     }
 
     public function getProfilData($id) 
     {
-        $query = "SELECT * FROM user WHERE id = :id";
-        $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(':id', $id);
-        $stmt->execute();
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+        $result = $this->conn->select($this->table, ['id' => 'eq.' . $id]);
+        return $result[0] ?? null;
     }
 
     public function setProfilData($fieldname, $data, $id) 
     {
-        $query = "UPDATE user SET " . $fieldname . " = :data WHERE id = :id";
-        $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(':id', $id);
-        $stmt->bindParam(':data', $data);
-
-        $stmt->execute();
+        return $this->conn->update($this->table, ['id' => 'eq.' . $id], [$fieldname => $data]);
     }
 
     public function change_password($user_id, $current_password, $new_password, $confirm_password)
     {
-        if (empty($current_password)  ) {
-            return "Please add you current password";
-        } 
-        if (empty($new_password)) {
-            return "Please enter a new password.";
-        }
-        if (empty($confirm_password)) {
-            return "Please confirm your new password.";
-        }
+        if (empty($current_password)) return "Please add your current password.";
+        if (empty($new_password)) return "Please enter a new password.";
+        if (empty($confirm_password)) return "Please confirm your new password.";
 
-        $query_compare = "SELECT password FROM " . $this->table . " WHERE id = :id";
-        $stmt = $this->conn->prepare($query_compare);
-        $stmt->bindParam(':id', $user_id, PDO::PARAM_INT);
-        $stmt->execute();
-        $result = $stmt->fetch(PDO::FETCH_OBJ);
+        $user = $this->conn->select($this->table, ['id' => 'eq.' . $user_id]);
+        if (empty($user)) return "User not found.";
 
-        $stored_hashed_password = $result->password;
-        $hashed_new_password = password_hash($new_password, PASSWORD_DEFAULT);
-
-        // var_dump(password_verify($current_password, $stored_hashed_password));s
-        
-        if (!password_verify($current_password, $stored_hashed_password)) {
+        $stored = $user[0]['password'];
+        if (!password_verify($current_password, $stored)) {
             return "The current password is incorrect.";
-        } 
-        elseif (password_verify($new_password, $stored_hashed_password)) {
-            return "New password cannot be the same as the current password.";
-        } 
-        elseif ($new_password !== $confirm_password) {
-            return "Your confirm password does not match. Please try again.";
-        } else {
-
-            $query = "UPDATE " . $this->table . " SET password = :password WHERE id = :id";
-            $stmt = $this->conn->prepare($query);
-            $stmt->bindParam(':id', $user_id, PDO::PARAM_INT);
-            $stmt->bindParam(':password', $hashed_new_password);
-
-            if ($stmt->execute()) {
-                return true;
-            } else {
-                return "Failed to update the password. Please try again.";
-            } 
         }
+        if (password_verify($new_password, $stored)) {
+            return "New password cannot be the same as the current password.";
+        }
+        if ($new_password !== $confirm_password) {
+            return "Your confirm password does not match.";
+        }
+
+        $hashed_new = password_hash($new_password, PASSWORD_DEFAULT);
+        $success = $this->conn->update($this->table, ['id' => 'eq.' . $user_id], ['password' => $hashed_new]);
+        return $success ? true : "Failed to update the password.";
     }
 
-    public function like_post($user_id, $like)
-    {
-        if($like === 1) {
-            $query = "UPDATE user SET like_post = 1 WHERE id = :id";
-            $stmt = $this->conn->prepare($query);
-            $stmt->bindParam(':id', $user_id);
-
-            $stmt->execute();
-        } else {
-            $query = "UPDATE user SET like_post = 0 WHERE id = :id";
-            $stmt = $this->conn->prepare($query);
-            $stmt->bindParam(':id', $user_id);
-
-            $stmt->execute();
-        }
+    public function like_post($user_id, $like) {
+        return $this->conn->update($this->table, ['id' => 'eq.' . $user_id], ['like_post' => $like ? 1 : 0]);
     }
 }

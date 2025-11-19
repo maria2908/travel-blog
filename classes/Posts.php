@@ -1,4 +1,6 @@
 <?php
+require_once('classes/Database.php');
+require_once('classes/User.php');
 
 class Posts
 {
@@ -7,171 +9,87 @@ class Posts
 
     public function __construct()
     {
-        require_once('classes/Database.php');
-        require_once('classes/User.php');
-        $database = new Database();
-        $this->conn = $database->getConnection();
+        $this->conn = (new Database())->getConnection();
     }
 
-    public function user_posts($user_id)
-    {
-        $query = "SELECT " . " posts.id, title, text, posts.img, country, topic, likes " . " FROM " . $this->table . " INNER JOIN country ON posts.country_id = country.id WHERE user_id=:user_id";
-        $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(':user_id', $user_id);
-        $stmt->execute();
-
-        return $stmt->fetchAll(PDO::FETCH_OBJ);
+    public function user_posts($user_id) {
+        return array_map(fn($p) => (object) $p, $this->conn->select('posts', ['user_id' => 'eq.' . $user_id]));
     }
 
-    public function all_posts($country = null)
-    {
-        if (empty($country)) {
-            $query = "SELECT " . " posts.id, title, text, posts.img, country, topic " . " FROM " . $this->table . " INNER JOIN country ON posts.country_id = country.id INNER JOIN topic ON posts.topic_id = topic.id ORDER BY create_date DESC ";
-            $stmt = $this->conn->prepare($query);
-        } else {
-            $query = "SELECT " . " posts.id, title, text, posts.img, country, topic " . " FROM " . $this->table . " INNER JOIN country ON posts.country_id = country.id INNER JOIN topic ON posts.topic_id = topic.id WHERE country=:country ORDER BY create_date DESC ";
-            $stmt = $this->conn->prepare($query);
-            $stmt->bindParam(':country', $country);
+    public function all_posts($country = null) {
+        $filters = ['order' => 'create_date.desc'];
+        if (!empty($country)) {
+            $filters['country'] = 'ilike.%' . $country . '%';
         }
-
-        $stmt->execute();
-
-        return $stmt->fetchAll(PDO::FETCH_OBJ);
+        return array_map(fn($p) => (object) $p, $this->conn->select('posts_view', $filters));
     }
 
-    public function one_post($id)
-    {
-        $query = "SELECT * FROM " . $this->table . " WHERE id=:id";
-        $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(':id', $id);
-        $stmt->execute();
-
-        return $stmt->fetch(PDO::FETCH_OBJ);
+    public function one_post($id) {
+        $result = $this->conn->select('posts', ['id' => 'eq.' . $id]);
+        return (object) ($result[0] ?? null);
     }
 
-    public function my_posts($user_id)
-    {
-        $query = "SELECT posts.id, title, text, posts.img, user_id, country.id AS country_id, country, topic.id AS topic_id, topic FROM " . $this->table . " INNER JOIN country ON posts.country_id = country.id INNER JOIN topic ON posts.topic_id = topic.id WHERE user_id=:user_id ORDER BY create_date DESC ";
-        $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(':user_id', $user_id);
-        $stmt->execute();
-
-        return $stmt->fetchAll(PDO::FETCH_OBJ);
+    public function my_posts($user_id) {
+        return array_map(fn($p) => (object) $p, $this->conn->select('posts_view', ['user_id' => 'eq.' . $user_id]));
     }
 
-    // public function uploadImage($file)
-    // {
-    //     // $targetDir = 'uploads/';
-
-
-    //     // if (!is_dir($targetDir)) {
-    //     //     mkdir($targetDir, 0777, true);
-    //     // } 
-
-    //     // chmod($targetDir, 0777);
-
-    //     if (isset($file) && $file['error'] === 0) {
-
-    //         $targetFile = basename($file['name']);
-    //         $imageFileType = strtolower(pathinfo($targetFile, PATHINFO_EXTENSION));
-    //         $allowedTypes = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
-
-    //         if (in_array($imageFileType, $allowedTypes)) {
-    //             $uniqueFileName = pathinfo($file['name'], PATHINFO_FILENAME) . '_' . uniqid() . '_' . time() . '.' . $imageFileType;
-    //             $targetFile = $uniqueFileName;
-
-    //             if (move_uploaded_file($file['tmp_name'], $targetFile)) {
-    //                 return $targetFile;
-    //             } else {
-    //                 return 'There was an error uploading the file';
-    //             }
-    //         } else {
-    //             return 'Only JPG, JPEG, PNG, GIF, and WEBP files are allowed';
-
-    //         }
-    //     }
-    //     return '';
-    // }
-
-    public function create($title, $text, $img, $user_id, $country_id, $topic_id, $create_date)
-    {
-        $query = "INSERT INTO " . $this->table . " (title, text, img, user_id, country_id, topic_id, create_date)
-                      VALUES (:title, :text, :img, :user_id, :country_id, :topic_id, :create_date)";
-
-        $stmt = $this->conn->prepare($query);
-
-        $stmt->bindParam(':title', $title);
-        $stmt->bindParam(':text', $text);
-        $stmt->bindParam(':img', $img);
-        $stmt->bindParam(':user_id', $user_id);
-        $stmt->bindParam(':country_id', $country_id);
-        $stmt->bindParam(':topic_id', $topic_id);
-        $stmt->bindParam(':create_date', $create_date);
-
-        return $stmt->execute();
+    public function create($title, $text, $img, $user_id, $country_id, $topic_id, $create_date) {
+        $data = [[
+            'title' => $title,
+            'text' => $text,
+            'img' => $img,
+            'user_id' => $user_id,
+            'country_id' => $country_id,
+            'topic_id' => $topic_id,
+            'create_date' => $create_date
+        ]];
+        return $this->conn->insert($this->table, $data);
     }
 
-    public function get_post_by_id($post_id)
-    {
-        $query = "SELECT posts.id, title, text, posts.img, user_id, country.id AS country_id, topic.id AS topic_id FROM " . $this->table . 
-                " INNER JOIN country ON posts.country_id = country.id INNER JOIN topic ON posts.topic_id = topic.id WHERE posts.id=:post_id ORDER BY create_date DESC ";
-        $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(':post_id', $post_id);
-        $stmt->execute();
-
-        return $stmt->fetch(PDO::FETCH_OBJ);
+    public function get_post_by_id($post_id) {
+        $result = $this->conn->select('posts_view', ['id' => 'eq.' . $post_id]);
+        return (object) ($result[0] ?? null);
     }
 
     public function delete_post_by_id($post_id) {
-        $query = "DELETE FROM posts WHERE id=:post_id";
-        $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(':post_id', $post_id);
-
-        $stmt->execute();
+        return $this->conn->delete($this->table, ['id' => 'eq.' . $post_id]);
     }
 
-    public function update_post($post_id, $title, $text, $img, $country_id, $topic_id)
-    {
-        $query = "UPDATE posts
-                  SET title = :title, text =:text, img = :img, country_id= :country_id, topic_id = :topic_id
-                  WHERE id=:post_id";
-        $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(':post_id', $post_id);
-        $stmt->bindParam(':title', $title);
-        $stmt->bindParam(':text', $text);
-        $stmt->bindParam(':img', $img);
-        $stmt->bindParam(':country_id', $country_id);
-        $stmt->bindParam(':topic_id', $topic_id);
-
-        $stmt->execute();
-
+    public function update_post($post_id, $title, $text, $img, $country_id, $topic_id) {
+        $data = [
+            'title' => $title,
+            'text' => $text,
+            'img' => $img,
+            'country_id' => $country_id,
+            'topic_id' => $topic_id
+        ];
+        return $this->conn->update($this->table, ['id' => 'eq.' . $post_id], $data);
     }
 
     public function userLiked($user_id, $post_id) {
-        $query = "SELECT 1 FROM post_likes WHERE user_id = ? AND post_id = ?";
-        $stmt = $this->conn->prepare($query);
-        $stmt->execute([$user_id, $post_id]);
-        return $stmt->fetchColumn() !== false;
+        $result = $this->conn->select('post_likes', [
+            'user_id' => 'eq.' . $user_id,
+            'post_id' => 'eq.' . $post_id
+        ]);
+        return !empty($result);
     }
 
     public function likePost($user_id, $post_id) {
-        $query = "INSERT IGNORE INTO post_likes (user_id, post_id) VALUES (?, ?)";
-        $stmt = $this->conn->prepare($query);
-        return $stmt->execute([$user_id, $post_id]);
-
+        return $this->conn->insert('post_likes', [[
+            'user_id' => $user_id,
+            'post_id' => $post_id
+        ]]);
     }
 
     public function unlikePost($user_id, $post_id) {
-        $query = "DELETE FROM post_likes WHERE user_id = ? AND post_id = ?";
-        $stmt = $this->conn->prepare($query);
-        return $stmt->execute([$user_id, $post_id]);
+        return $this->conn->delete('post_likes', [
+            'user_id' => 'eq.' . $user_id,
+            'post_id' => 'eq.' . $post_id
+        ]);
     }
 
     public function getLikeCount($post_id) {
-        $query = "SELECT COUNT(*) FROM post_likes WHERE post_id = ?";
-        $stmt = $this->conn->prepare($query);
-
-        $stmt->execute([$post_id]);
-        return $stmt->fetchColumn();
+        $result = $this->conn->select('post_likes', ['post_id' => 'eq.' . $post_id]);
+        return count($result);
     }
 }
